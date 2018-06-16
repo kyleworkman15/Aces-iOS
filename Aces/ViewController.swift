@@ -54,8 +54,9 @@ class ViewController: UIViewController, GIDSignInUIDelegate {
         txtLabel2.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive=true
         txtLabel2.heightAnchor.constraint(equalToConstant: 40).isActive=true
         
-        let acesLogo = "aces_image.png"
-        let image = UIImage(named: acesLogo)
+        let acesLogo = "aces_image"
+        let acesPath = Bundle.main.path(forResource: acesLogo, ofType: "png", inDirectory: "Images")
+        let image = UIImage(named: acesPath!)
         let imageView = UIImageView(image: image)
         view.addSubview(imageView)
         let width: CGFloat = 250

@@ -15,15 +15,12 @@
 		4E56784520D2B4C60075FA9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4E56784320D2B4C60075FA9C /* LaunchScreen.storyboard */; };
 		4E56785020D2B4C60075FA9C /* AcesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56784F20D2B4C60075FA9C /* AcesTests.swift */; };
 		4E56785B20D2B4C60075FA9C /* AcesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56785A20D2B4C60075FA9C /* AcesUITests.swift */; };
-		4E56786920D2C53A0075FA9C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4E56786820D2C53A0075FA9C /* GoogleService-Info.plist */; };
-		4E56787A20D2E1630075FA9C /* augustana_symbol.png in Resources */ = {isa = PBXBuildFile; fileRef = 4E56787620D2E1630075FA9C /* augustana_symbol.png */; };
-		4E56787B20D2E1630075FA9C /* aces_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 4E56787720D2E1630075FA9C /* aces_image.png */; };
-		4E56787C20D2E1630075FA9C /* augie.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4E56787820D2E1630075FA9C /* augie.jpg */; };
-		4E56787D20D2E1630075FA9C /* aardvark.png in Resources */ = {isa = PBXBuildFile; fileRef = 4E56787920D2E1630075FA9C /* aardvark.png */; };
 		4E56787F20D2E55F0075FA9C /* RideInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56787E20D2E55F0075FA9C /* RideInfo.swift */; };
 		4E56788120D2EF2E0075FA9C /* MapsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56788020D2EF2E0075FA9C /* MapsView.swift */; };
 		4E56788320D41BCE0075FA9C /* AcesConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56788220D41BCE0075FA9C /* AcesConfiguration.swift */; };
 		4ED0A9BB20D4B54E00C17E69 /* RequestedRideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED0A9BA20D4B54E00C17E69 /* RequestedRideView.swift */; };
+		4ED0A9C120D57C0A00C17E69 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */; };
+		4ED0A9C320D57CAF00C17E69 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 4ED0A9C220D57CAF00C17E69 /* Images */; };
 		5DD0C966FFC29AD176513704 /* Pods_AcesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8888B00E63606125EC88D7 /* Pods_AcesTests.framework */; };
 		C90A0337A80EEF44436F5045 /* Pods_Aces.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D39A9286FF91058CA29C96BF /* Pods_Aces.framework */; };
 		F3D1EDB4063B1A0A9D8AA1D2 /* Pods_AcesUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFA3A541D0B803F002575A9E /* Pods_AcesUITests.framework */; };
@@ -61,15 +58,12 @@
 		4E56785620D2B4C60075FA9C /* AcesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AcesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E56785A20D2B4C60075FA9C /* AcesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcesUITests.swift; sourceTree = "<group>"; };
 		4E56785C20D2B4C60075FA9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4E56786820D2C53A0075FA9C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4E56787620D2E1630075FA9C /* augustana_symbol.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = augustana_symbol.png; path = ../augustana_symbol.png; sourceTree = "<group>"; };
-		4E56787720D2E1630075FA9C /* aces_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = aces_image.png; path = ../aces_image.png; sourceTree = "<group>"; };
-		4E56787820D2E1630075FA9C /* augie.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = augie.jpg; path = ../augie.jpg; sourceTree = "<group>"; };
-		4E56787920D2E1630075FA9C /* aardvark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = aardvark.png; path = ../aardvark.png; sourceTree = "<group>"; };
 		4E56787E20D2E55F0075FA9C /* RideInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideInfo.swift; sourceTree = "<group>"; };
 		4E56788020D2EF2E0075FA9C /* MapsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsView.swift; sourceTree = "<group>"; };
 		4E56788220D41BCE0075FA9C /* AcesConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcesConfiguration.swift; sourceTree = "<group>"; };
 		4ED0A9BA20D4B54E00C17E69 /* RequestedRideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestedRideView.swift; sourceTree = "<group>"; };
+		4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4ED0A9C220D57CAF00C17E69 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		5E8888B00E63606125EC88D7 /* Pods_AcesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AcesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		666AD8520D3169C72A28EF09 /* Pods-Aces.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Aces.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Aces/Pods-Aces.debug.xcconfig"; sourceTree = "<group>"; };
 		6D4E060E3CFD0C928E1CD8D8 /* Pods-AcesUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AcesUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AcesUITests/Pods-AcesUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -112,10 +106,7 @@
 		4E56782B20D2B4C50075FA9C = {
 			isa = PBXGroup;
 			children = (
-				4E56787920D2E1630075FA9C /* aardvark.png */,
-				4E56787720D2E1630075FA9C /* aces_image.png */,
-				4E56787820D2E1630075FA9C /* augie.jpg */,
-				4E56787620D2E1630075FA9C /* augustana_symbol.png */,
+				4ED0A9C220D57CAF00C17E69 /* Images */,
 				4E56783620D2B4C50075FA9C /* Aces */,
 				4E56784E20D2B4C60075FA9C /* AcesTests */,
 				4E56785920D2B4C60075FA9C /* AcesUITests */,
@@ -138,7 +129,7 @@
 		4E56783620D2B4C50075FA9C /* Aces */ = {
 			isa = PBXGroup;
 			children = (
-				4E56786820D2C53A0075FA9C /* GoogleService-Info.plist */,
+				4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */,
 				4E56783720D2B4C50075FA9C /* AppDelegate.swift */,
 				4E56783920D2B4C50075FA9C /* ViewController.swift */,
 				4E56788020D2EF2E0075FA9C /* MapsView.swift */,
@@ -304,14 +295,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E56787A20D2E1630075FA9C /* augustana_symbol.png in Resources */,
+				4ED0A9C320D57CAF00C17E69 /* Images in Resources */,
 				4E56784520D2B4C60075FA9C /* LaunchScreen.storyboard in Resources */,
-				4E56786920D2C53A0075FA9C /* GoogleService-Info.plist in Resources */,
-				4E56787D20D2E1630075FA9C /* aardvark.png in Resources */,
-				4E56787C20D2E1630075FA9C /* augie.jpg in Resources */,
+				4ED0A9C120D57C0A00C17E69 /* GoogleService-Info.plist in Resources */,
 				4E56784220D2B4C60075FA9C /* Assets.xcassets in Resources */,
 				4E56783D20D2B4C50075FA9C /* Main.storyboard in Resources */,
-				4E56787B20D2E1630075FA9C /* aces_image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
