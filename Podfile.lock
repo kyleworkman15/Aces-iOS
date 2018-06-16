@@ -1,0 +1,89 @@
+PODS:
+  - Firebase/Auth (5.2.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (= 5.0.1)
+  - Firebase/CoreOnly (5.2.0):
+    - FirebaseCore (= 5.0.3)
+  - Firebase/Database (5.2.0):
+    - Firebase/CoreOnly
+    - FirebaseDatabase (= 5.0.1)
+  - FirebaseAuth (5.0.1):
+    - FirebaseCore (~> 5.0)
+    - GTMSessionFetcher/Core (~> 1.1)
+  - FirebaseCore (5.0.3):
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
+  - FirebaseDatabase (5.0.1):
+    - FirebaseCore (~> 5.0)
+    - leveldb-library (~> 1.18)
+  - GoogleMaps (2.7.0):
+    - GoogleMaps/Maps (= 2.7.0)
+  - GoogleMaps/Base (2.7.0)
+  - GoogleMaps/Maps (2.7.0):
+    - GoogleMaps/Base
+  - GooglePlaces (2.7.0):
+    - GoogleMaps/Base (= 2.7.0)
+  - GoogleSignIn (4.1.2):
+    - "GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)"
+    - "GoogleToolboxForMac/NSString+URLArguments (~> 2.1)"
+    - GTMOAuth2 (~> 1.0)
+    - GTMSessionFetcher/Core (~> 1.1)
+  - GoogleToolboxForMac/DebugUtils (2.1.4):
+    - GoogleToolboxForMac/Defines (= 2.1.4)
+  - GoogleToolboxForMac/Defines (2.1.4)
+  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
+    - GoogleToolboxForMac/Defines (= 2.1.4)
+  - "GoogleToolboxForMac/NSDictionary+URLArguments (2.1.4)":
+    - GoogleToolboxForMac/DebugUtils (= 2.1.4)
+    - GoogleToolboxForMac/Defines (= 2.1.4)
+    - "GoogleToolboxForMac/NSString+URLArguments (= 2.1.4)"
+  - "GoogleToolboxForMac/NSString+URLArguments (2.1.4)"
+  - GTMOAuth2 (1.1.6):
+    - GTMSessionFetcher (~> 1.1)
+  - GTMSessionFetcher (1.1.15):
+    - GTMSessionFetcher/Full (= 1.1.15)
+  - GTMSessionFetcher/Core (1.1.15)
+  - GTMSessionFetcher/Full (1.1.15):
+    - GTMSessionFetcher/Core (= 1.1.15)
+  - leveldb-library (1.20)
+  - Toast-Swift (3.0.1)
+
+DEPENDENCIES:
+  - Firebase/Auth
+  - Firebase/Database
+  - GoogleMaps
+  - GooglePlaces
+  - GoogleSignIn
+  - Toast-Swift
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Firebase
+    - FirebaseAuth
+    - FirebaseCore
+    - FirebaseDatabase
+    - GoogleMaps
+    - GooglePlaces
+    - GoogleSignIn
+    - GoogleToolboxForMac
+    - GTMOAuth2
+    - GTMSessionFetcher
+    - leveldb-library
+    - Toast-Swift
+
+SPEC CHECKSUMS:
+  Firebase: 25ed0412036d7d008568d1fb4d2e9d81ea8a0a2c
+  FirebaseAuth: 463b8ce33bd5d05f706dcd4615499e3212b4132b
+  FirebaseCore: a3c87242451633fff8490183898075ce77d168d2
+  FirebaseDatabase: 482bad9c2abd422bb2321194fb8c937e67426a89
+  GoogleMaps: f79af95cb24d869457b1f961c93d3ce8b2f3b848
+  GooglePlaces: 3d06e6c99654545b4738ce49648745779c25f2ef
+  GoogleSignIn: d9ef55b10f0aa401a5de2747f59b725e4b9732ac
+  GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
+  GTMOAuth2: c77fe325e4acd453837e72d91e3b5f13116857b2
+  GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
+  leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
+  Toast-Swift: ba0b01b095aada709d915f9beb1d38184a2721c3
+
+PODFILE CHECKSUM: 32031e65ca8ad8cd8a1b57fe839270d934f0639d
+
+COCOAPODS: 1.5.3
