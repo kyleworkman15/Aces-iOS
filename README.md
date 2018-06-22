@@ -3,6 +3,8 @@ Aces app for Apple users
 
 Latest changes not uploaded yet:
 
+- Lots of bug fixes
+- Much better looking UI
 - Loading disc when signing in
 - Search is now done via local database that I entered manually, instead of google’s servers
 - Search is on the same screen rather than on a new screen so it takes less time to get there
