@@ -4,6 +4,7 @@ Aces app for Apple users
 Latest changes not uploaded yet:
 
 - Lots of bug fixes
+- Tracks cancelled/completed rides much better
 - Much better looking UI
 - Loading disc when signing in
 - Search is now done via local database that I entered manually, instead of google’s servers
