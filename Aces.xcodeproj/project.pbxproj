@@ -18,6 +18,8 @@
 		4E56787F20D2E55F0075FA9C /* RideInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56787E20D2E55F0075FA9C /* RideInfo.swift */; };
 		4E56788120D2EF2E0075FA9C /* MapsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56788020D2EF2E0075FA9C /* MapsView.swift */; };
 		4E56788320D41BCE0075FA9C /* AcesConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E56788220D41BCE0075FA9C /* AcesConfiguration.swift */; };
+		4EC759A320DC2BAB0052827D /* LocationDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC759A220DC2BAB0052827D /* LocationDatabase.swift */; };
+		4ECDED7E20D5CE920091ECC9 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ECDED7D20D5CE920091ECC9 /* AboutView.swift */; };
 		4ED0A9BB20D4B54E00C17E69 /* RequestedRideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED0A9BA20D4B54E00C17E69 /* RequestedRideView.swift */; };
 		4ED0A9C120D57C0A00C17E69 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */; };
 		4ED0A9C320D57CAF00C17E69 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 4ED0A9C220D57CAF00C17E69 /* Images */; };
@@ -61,6 +63,9 @@
 		4E56787E20D2E55F0075FA9C /* RideInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideInfo.swift; sourceTree = "<group>"; };
 		4E56788020D2EF2E0075FA9C /* MapsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsView.swift; sourceTree = "<group>"; };
 		4E56788220D41BCE0075FA9C /* AcesConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcesConfiguration.swift; sourceTree = "<group>"; };
+		4E6949CA2108DFAA006BC4D5 /* Aces.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Aces.entitlements; sourceTree = "<group>"; };
+		4EC759A220DC2BAB0052827D /* LocationDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDatabase.swift; sourceTree = "<group>"; };
+		4ECDED7D20D5CE920091ECC9 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		4ED0A9BA20D4B54E00C17E69 /* RequestedRideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestedRideView.swift; sourceTree = "<group>"; };
 		4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4ED0A9C220D57CAF00C17E69 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
@@ -129,13 +134,16 @@
 		4E56783620D2B4C50075FA9C /* Aces */ = {
 			isa = PBXGroup;
 			children = (
+				4E6949CA2108DFAA006BC4D5 /* Aces.entitlements */,
 				4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */,
 				4E56783720D2B4C50075FA9C /* AppDelegate.swift */,
 				4E56783920D2B4C50075FA9C /* ViewController.swift */,
+				4ECDED7D20D5CE920091ECC9 /* AboutView.swift */,
 				4E56788020D2EF2E0075FA9C /* MapsView.swift */,
 				4ED0A9BA20D4B54E00C17E69 /* RequestedRideView.swift */,
 				4E56787E20D2E55F0075FA9C /* RideInfo.swift */,
 				4E56788220D41BCE0075FA9C /* AcesConfiguration.swift */,
+				4EC759A220DC2BAB0052827D /* LocationDatabase.swift */,
 				4E56783B20D2B4C50075FA9C /* Main.storyboard */,
 				4E56784120D2B4C60075FA9C /* Assets.xcassets */,
 				4E56784320D2B4C60075FA9C /* LaunchScreen.storyboard */,
@@ -259,6 +267,11 @@
 				TargetAttributes = {
 					4E56783320D2B4C50075FA9C = {
 						CreatedOnToolsVersion = 9.4.1;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					4E56784A20D2B4C60075FA9C = {
 						CreatedOnToolsVersion = 9.4.1;
@@ -406,16 +419,22 @@
 				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SearchTextField/SearchTextField.framework",
 				"${BUILT_PRODUCTS_DIR}/Toast-Swift/Toast_Swift.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SearchTextField.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Toast_Swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -429,12 +448,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4ECDED7E20D5CE920091ECC9 /* AboutView.swift in Sources */,
 				4E56788120D2EF2E0075FA9C /* MapsView.swift in Sources */,
 				4E56788320D41BCE0075FA9C /* AcesConfiguration.swift in Sources */,
 				4E56783A20D2B4C50075FA9C /* ViewController.swift in Sources */,
 				4E56787F20D2E55F0075FA9C /* RideInfo.swift in Sources */,
 				4E56783820D2B4C50075FA9C /* AppDelegate.swift in Sources */,
 				4ED0A9BB20D4B54E00C17E69 /* RequestedRideView.swift in Sources */,
+				4EC759A320DC2BAB0052827D /* LocationDatabase.swift in Sources */,
 				4E56784020D2B4C50075FA9C /* Aces.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -609,15 +630,18 @@
 			baseConfigurationReference = 666AD8520D3169C72A28EF09 /* Pods-Aces.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Aces/Aces.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 528KSLHB43;
+				DEVELOPMENT_TEAM = 9Y69934FFE;
 				INFOPLIST_FILE = Aces/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = Augustana.Aces;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.aces;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -628,15 +652,18 @@
 			baseConfigurationReference = DD85A79AC007CB933B13BFB7 /* Pods-Aces.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Aces/Aces.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 528KSLHB43;
+				DEVELOPMENT_TEAM = 9Y69934FFE;
 				INFOPLIST_FILE = Aces/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = Augustana.Aces;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.aces;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -7,7 +7,25 @@
 		<key>Aces.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>11</integer>
+			<integer>15</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>4E56783320D2B4C50075FA9C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>4E56784A20D2B4C60075FA9C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>4E56785520D2B4C60075FA9C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

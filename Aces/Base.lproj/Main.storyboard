@@ -82,5 +82,23 @@
             </objects>
             <point key="canvasLocation" x="-671.20000000000005" y="-546.47676161919048"/>
         </scene>
+        <!--About View-->
+        <scene sceneID="uOd-nj-SZk">
+            <objects>
+                <viewController storyboardIdentifier="about" id="zVl-Jt-Udr" customClass="AboutView" customModule="Aces" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="r0a-g3-a0U"/>
+                        <viewControllerLayoutGuide type="bottom" id="J2d-pr-uxg"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="bgX-KK-wjc">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9rJ-hN-b0u" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-671" y="105"/>
+        </scene>
     </scenes>
 </document>

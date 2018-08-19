@@ -7,12 +7,16 @@ target 'Aces' do
 
   # Pods for Aces
 
+pod 'Firebase'
+pod 'Firebase/Core'
+pod 'Firebase/Messaging'
 pod 'Firebase/Auth'
 pod 'GoogleSignIn'
 pod 'GoogleMaps'
 pod 'GooglePlaces'
 pod 'Toast-Swift'
 pod 'Firebase/Database'
+pod 'SearchTextField'
 
   target 'AcesTests' do
     inherit! :search_paths
