@@ -2,8 +2,8 @@
 //  AppDelegate.swift
 //  Aces
 //
-//  Created by checkout-7 on 6/14/18.
-//  Copyright © 2018 checkout-7. All rights reserved.
+//  Created by Kyle Workman on 6/14/18.
+//  Copyright © 2018 Kyle Workman. All rights reserved.
 //
 
 import UIKit
@@ -12,54 +12,97 @@ import Firebase
 import GoogleSignIn
 import GoogleMaps
 import GooglePlaces
+import Toast_Swift
+import UserNotifications
+import FirebaseInstanceID
+import FirebaseMessaging
+
+//    FIRAuth.auth()?.addStateDidChangeListener { auth, user in
+//    if let user = user {
+//    // User is signed in.
+//    } else {
+//    // No user is signed in.
+//    }
+//    }
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDSignInDelegate {
-
+class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDSignInDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+    
     var window: UIWindow?
     var email: String = ""
+    var token: String = " "
+    let gcmMessageIDKey = "gcm.message_id"
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-    
         FirebaseApp.configure()
+        Messaging.messaging().delegate = self
+        if #available(iOS 10.0, *) {
+            // For iOS 10 display notification (sent via APNS)
+            UNUserNotificationCenter.current().delegate = self
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(
+                options: authOptions,
+                completionHandler: {_, _ in })
+        } else {
+            let settings: UIUserNotificationSettings =
+                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+            application.registerUserNotificationSettings(settings)
+        }
+        application.registerForRemoteNotifications()
+        
+        // Configure Firebase and Google services
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         GIDSignIn.sharedInstance().delegate = self
-        GMSServices.provideAPIKey("AIzaSyC3SHI9TCucSmSEwxgiCweY7U6hlQl9Qws")
-        GMSPlacesClient.provideAPIKey("AIzaSyC3SHI9TCucSmSEwxgiCweY7U6hlQl9Qws")
-        
+        GMSServices.provideAPIKey("")
+        GMSPlacesClient.provideAPIKey("")
         return true
     }
     
+    // Handle Google/Firebase sign in
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        // Cancelled Google sign in
         if let err = error {
-            print("Failed to log into Google: ", err)
+            print(err)
+            self.window?.rootViewController?.view.hideToastActivity()
+            self.window?.rootViewController?.view.isUserInteractionEnabled = true
             return
         }
+        
+        // Successful Google sign in
         guard let idToken = user.authentication.idToken else { return }
         guard let accessToken = user.authentication.accessToken else { return }
         let credentials = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+        
+        // Authenticate with Firebase
         Auth.auth().signInAndRetrieveData(with: credentials, completion: { (user, error) in
+            
+            // Error authenticating with Firebase
             if let err = error {
-                print("Firebase failed with google account: ", err)
+                print(err)
                 return
             }
+            
+            // Successful Firebase authentication
             guard let userUnwrapped = Auth.auth().currentUser else {return}
             self.email = userUnwrapped.email!
             
+            // Check if Augustana email address
             if (self.email.contains("@augustana.edu")) {
                 let mainStoryboardIpad : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 let initialViewControlleripad : UIViewController = mainStoryboardIpad.instantiateViewController(withIdentifier: "map") as UIViewController
                 self.window = UIWindow(frame: UIScreen.main.bounds)
                 self.window?.rootViewController = initialViewControlleripad
                 self.window?.makeKeyAndVisible()
-            } else {
+            } else { // Not Augustana email address, force sign out
+                self.window?.rootViewController?.view.hideToastActivity()
+                self.window?.rootViewController?.view.isUserInteractionEnabled = true
                 self.window?.makeToast("Must login with Augustana email!", position: .bottom)
                 GIDSignIn.sharedInstance().signOut()
             }
         })
     }
     
+    // Handle URL for Google sign in
     func application(_ application: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any])
         -> Bool {
             return GIDSignIn.sharedInstance().handle(url,
@@ -69,6 +112,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
     
     func getEmail() -> String {
         return email
+    }
+    
+    func getToken() -> String {
+        return token
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -139,6 +186,66 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
             }
         }
     }
-
+    
+    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+        print("REMOTE MESSAGE")
+        print(remoteMessage.appData)
+    }
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+        print("Firebase registration token: \(fcmToken)")
+        
+        let dataDict:[String: String] = ["token": fcmToken]
+        NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
+        token = fcmToken
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
+        print("deviceTokenString: \(deviceTokenString)")
+        //self.apnsToken = deviceTokenString
+        
+        //set apns token in messaging
+        Messaging.messaging().apnsToken = deviceToken
+    }
+    
+    @available(iOS 10, *)
+    // Receive displayed notifications for iOS 10 devices.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let userInfo = notification.request.content.userInfo
+        
+        // With swizzling disabled you must let Messaging know about the message, for Analytics
+        // Messaging.messaging().appDidReceiveMessage(userInfo)
+        // Print message ID.
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        // Print full message.
+        print(userInfo)
+        
+        // Change this to your preferred presentation option
+        completionHandler([.alert, .badge, .sound])
+    }
+    
+    @available(iOS 10, *)
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        // Print message ID.
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        // Print full message.
+        print(userInfo)
+        
+        completionHandler()
+    }
+    
+    
 }
 

@@ -2,8 +2,10 @@
 //  RideInfo.swift
 //  Aces
 //
-//  Created by checkout-7 on 6/14/18.
-//  Copyright © 2018 checkout-7. All rights reserved.
+//  Description: Class for handeling the information about a single ride.
+//
+//  Created by Kyle Workman on 6/14/18.
+//  Copyright © 2018 Kyle Workman. All rights reserved.
 //
 
 import Foundation
@@ -17,9 +19,10 @@ class RideInfo {
     private var start: String
     private var time: String
     private var waitTime: String
-    private var ts: String
+    private var ts: CLong
+    private var token: String
     
-    init(email: String, end: String, endTime: String, eta: String, numRiders: String, start: String, time: String, waitTime: String, ts: String) {
+    init(email: String, end: String, endTime: String, eta: String, numRiders: String, start: String, time: String, waitTime: String, ts: CLong, token: String) {
         self.email = email
         self.end = end
         self.endTime = endTime
@@ -29,6 +32,7 @@ class RideInfo {
         self.time = time
         self.waitTime = waitTime
         self.ts = ts
+        self.token = token
     }
     
     func getEmail() -> String {
@@ -95,11 +99,19 @@ class RideInfo {
         self.waitTime = waitTime
     }
     
-    func getTimestamp() -> String {
+    func getTimestamp() -> CLong {
         return ts
     }
     
-    func setTimestamp(ts: String) {
+    func setTimestamp(ts: CLong) {
         self.ts = ts
+    }
+    
+    func getToken() -> String {
+        return token
+    }
+    
+    func setToken(token: String) {
+        self.token = token
     }
 }

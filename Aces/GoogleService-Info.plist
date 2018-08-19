@@ -7,34 +7,34 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>474648295298-ujblr6rnimlto29tem0cj2kj8kgs6esa.apps.googleusercontent.com</string>
+	<string>691410651327-qmv3m1ag26vck8t60rks5lmra3uaks0u.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.474648295298-ujblr6rnimlto29tem0cj2kj8kgs6esa</string>
+	<string>com.googleusercontent.apps.691410651327-qmv3m1ag26vck8t60rks5lmra3uaks0u</string>
 	<key>API_KEY</key>
-	<string>AIzaSyC3SHI9TCucSmSEwxgiCweY7U6hlQl9Qws</string>
+	<string>AIzaSyCZq4mtqvEH77v7TDPLIQ4T_PsZDA8JOCo</string>
 	<key>GCM_SENDER_ID</key>
-	<string>474648295298</string>
+	<string>691410651327</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.augustana.aces</string>
+	<string>edu.augustana.aces</string>
 	<key>PROJECT_ID</key>
-	<string>aardvarkrepo</string>
+	<string>augustana-aces</string>
 	<key>STORAGE_BUCKET</key>
-	<string>aardvarkrepo.appspot.com</string>
+	<string>augustana-aces.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:474648295298:ios:d4dde92982cd7852</string>
+	<string>1:691410651327:ios:8d1c6815f02cf635</string>
 	<key>DATABASE_URL</key>
-	<string>https://aardvarkrepo.firebaseio.com</string>
+	<string>https://augustana-aces.firebaseio.com</string>
 </dict>
 </plist>
