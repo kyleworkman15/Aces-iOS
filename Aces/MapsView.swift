@@ -29,6 +29,11 @@ struct MyPlace {
 class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLocationManagerDelegate, GMSMapViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, MyProtocol, GMSAutocompleteViewControllerDelegate {
    
     var ref: DatabaseReference!
+    var location: CLLocation = CLLocation(latitude: 0, longitude: 0)
+    var locDB: LocationDatabase = LocationDatabase()
+    var favStart = UIImageView()
+    var favEnd = UIImageView()
+    var favorites = [String : Array<Double>]()
     var flag: String = ""
     var message: String = ""
     var locationManager = CLLocationManager()
@@ -39,11 +44,11 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     var markerStart = GMSMarker()
     var markerEnd = GMSMarker()
     var riders = ["1", "2", "3", "4", "5", "6", "7"]
-    var ride: RideInfo = RideInfo(email: "",end: "",endTime: "",eta: "",numRiders: "",start: "",time: "",waitTime: "",ts: 0,token: "")
-    var places = LocationDatabase.init().getPlaces()
-    var names = LocationDatabase.init().getNames()
+    var ride: RideInfo = RideInfo(email: "",end: "",endTime: "",eta: "",numRiders: "",start: "",time: "",waitTime: "",ts: 0,token: "",vehicle: "")
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var autocompleteController = GMSAutocompleteViewController()
+    var isActivated = false
+    var estWaitTime: Int = 5
     
     let mapView: GMSMapView = {
         let v = GMSMapView()
@@ -81,6 +86,17 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         return btn
     }()
     
+    let estWTLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.backgroundColor = UIColor.init(red: 255, green: 255, blue: 255, alpha: 0.50)
+        lbl.textColor = .black
+        lbl.textAlignment = .center
+        lbl.translatesAutoresizingMaskIntoConstraints=false
+        lbl.numberOfLines = 0
+        lbl.adjustsFontSizeToFitWidth = true
+        return lbl
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -88,9 +104,14 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         mapView.delegate = self
         self.ref = Database.database().reference()
         
+        ToastManager.shared.style.activityBackgroundColor = UIColor.init(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.9)
+        ToastManager.shared.style.activityIndicatorColor = UIColor.init(red: 0/255, green: 0/255, blue: 0/255, alpha: 1.0)
+        mapView.makeToastActivity(.center)
+        view.isUserInteractionEnabled = false
+        
         initListener()
         hasCurrentRide()
-        
+        getFavorites()
         setupAutocomplete()
         
         requestBtn.addTarget(self, action: #selector(requestAction), for: .touchUpInside)
@@ -102,17 +123,182 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         locationManager.startMonitoringSignificantLocationChanges()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         
         initViews()
+        setupFavStars()
         initGoogleMaps()
+        locationListener()
         
         markerStart.icon = GMSMarker.markerImage(with: UIColor.green)
         markerEnd.icon = GMSMarker.markerImage(with: UIColor.red)
         
         txtFieldStart.delegate = self
+        txtFieldStart.comparisonOptions = [.forcedOrdering, .caseInsensitive]
+        txtFieldEnd.comparisonOptions = [.forcedOrdering, .caseInsensitive]
         txtFieldEnd.delegate = self
         ridersSelector.delegate = self
         ridersSelector.dataSource = self
+    }
+    
+    func setupFavStars() {
+        favStart.isHidden = true
+        favEnd.isHidden = true
+        view.addSubview(favStart)
+        view.addSubview(favEnd)
+        let tapDelegateStart = UITapGestureRecognizer(target: self, action: #selector(tappedStart(tapDelegate:)))
+        let tapDelegateEnd = UITapGestureRecognizer(target: self, action: #selector(tappedEnd(tapDelegate:)))
+        favStart.isUserInteractionEnabled = true
+        favStart.addGestureRecognizer(tapDelegateStart)
+        favEnd.isUserInteractionEnabled = true
+        favEnd.addGestureRecognizer(tapDelegateEnd)
+        let screenSize = UIScreen.main.bounds
+        favStart.translatesAutoresizingMaskIntoConstraints = false
+        favStart.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive=true
+        favStart.leftAnchor.constraint(equalTo: view.leftAnchor, constant: screenSize.width-10-35).isActive=true
+        favStart.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive=true
+        favStart.heightAnchor.constraint(equalToConstant: 35).isActive=true
+        favEnd.translatesAutoresizingMaskIntoConstraints = false
+        favEnd.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50).isActive=true
+        favEnd.leftAnchor.constraint(equalTo: view.leftAnchor, constant: screenSize.width-10-35).isActive=true
+        favEnd.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive=true
+        favEnd.heightAnchor.constraint(equalToConstant: 35).isActive=true
+        let path = Bundle.main.path(forResource: "btn_star_big_off", ofType: "png", inDirectory: "Images")
+        favStart.image = UIImage(named: path!)
+        favEnd.image = UIImage(named: path!)
+    }
+    
+    @objc
+    func tappedStart(tapDelegate: UITapGestureRecognizer) {
+        if (favorites[chosenPlaceStart.name] != nil) {
+            view.makeToast("Removed from favorites", position: .center)
+            favorites.removeValue(forKey: chosenPlaceStart.name)
+            removeFavoriteFromDropDownAndDatabase(name: chosenPlaceStart.name)
+            saveFavorites()
+            let path = Bundle.main.path(forResource: "btn_star_big_off", ofType: "png", inDirectory: "Images")
+            favStart.image = UIImage(named: path!)
+        } else {
+            displayPopUpForFavorite(b: true)
+        }
+        if (chosenPlaceStart.name == chosenPlaceEnd.name) {
+            setStar(name: chosenPlaceEnd.name, v: favEnd)
+        }
+    }
+    
+    @objc
+    func tappedEnd(tapDelegate: UITapGestureRecognizer) {
+        if (favorites[chosenPlaceEnd.name] != nil) {
+            view.makeToast("Removed from favorites", position: .center)
+            favorites.removeValue(forKey: chosenPlaceEnd.name)
+            removeFavoriteFromDropDownAndDatabase(name: chosenPlaceEnd.name)
+            saveFavorites()
+            let path = Bundle.main.path(forResource: "btn_star_big_off", ofType: "png", inDirectory: "Images")
+            favEnd.image = UIImage(named: path!)
+        } else {
+            displayPopUpForFavorite(b: false)
+        }
+        if (chosenPlaceStart.name == chosenPlaceEnd.name) {
+            setStar(name: chosenPlaceStart.name, v: favStart)
+        }
+    }
+    
+    func displayPopUpForFavorite(b: Bool) {
+        let alertController = UIAlertController(title: "Add to Favorites", message: "Enter a nickname for the location. The location will be saved in the drop down box.", preferredStyle: UIAlertControllerStyle.alert)
+        alertController.addTextField(configurationHandler: { (textField: UITextField!) -> Void in
+            
+        })
+        let addAction = UIAlertAction(title: "Add", style: UIAlertActionStyle.default, handler: { (alert) -> Void in
+            let field = alertController.textFields![0] as UITextField
+            let favorite = field.text ?? ""
+            if (b) {
+                let oldNameStr = self.chosenPlaceStart.name
+                let oldName = self.chosenPlaceStart.name.split(separator: "-")
+                self.chosenPlaceStart.name = "\(String(describing: favorite)) - \(oldName[oldName.count-1].trimmingCharacters(in: .whitespacesAndNewlines))"
+                self.favorites[self.chosenPlaceStart.name] = [self.chosenPlaceStart.lat, self.chosenPlaceStart.long]
+                self.addFavoriteToDropDownAndDatabase(name: self.chosenPlaceStart.name, lat: self.chosenPlaceStart.lat, long: self.chosenPlaceStart.long)
+                self.saveFavorites()
+                self.txtFieldStart.text = "Start: \(self.chosenPlaceStart.name)"
+                self.markerStart.title = "Start: \(self.chosenPlaceStart.name)"
+                let path = Bundle.main.path(forResource: "btn_star_big_on", ofType: "png", inDirectory: "Images")
+                self.favStart.image = UIImage(named: path!)
+                if (oldNameStr == self.chosenPlaceEnd.name) {
+                    self.chosenPlaceEnd.name = self.chosenPlaceStart.name
+                    self.setStar(name: self.chosenPlaceEnd.name, v: self.favEnd)
+                    self.txtFieldEnd.text = "End: \(self.chosenPlaceEnd.name)"
+                    self.markerEnd.title = "End: \(self.chosenPlaceEnd.name)"
+                }
+            } else {
+                let oldNameStr = self.chosenPlaceEnd.name
+                let oldName = self.chosenPlaceEnd.name.split(separator: "-")
+                self.chosenPlaceEnd.name = "\(String(describing: favorite)) -\(oldName[oldName.count-1])"
+                self.favorites[self.chosenPlaceEnd.name] = [self.chosenPlaceEnd.lat, self.chosenPlaceEnd.long]
+                self.addFavoriteToDropDownAndDatabase(name: self.chosenPlaceEnd.name, lat: self.chosenPlaceEnd.lat, long: self.chosenPlaceEnd.long)
+                self.saveFavorites()
+                self.txtFieldEnd.text = "End: \(self.chosenPlaceEnd.name)"
+                self.markerEnd.title = "End: \(self.chosenPlaceEnd.name)"
+                let path = Bundle.main.path(forResource: "btn_star_big_on", ofType: "png", inDirectory: "Images")
+                self.favEnd.image = UIImage(named: path!)
+                if (oldNameStr == self.chosenPlaceStart.name) {
+                    self.chosenPlaceStart.name = self.chosenPlaceEnd.name
+                    self.setStar(name: self.chosenPlaceStart.name, v: self.favStart)
+                    self.txtFieldStart.text = "Start: \(self.chosenPlaceStart.name)"
+                    self.markerStart.title = "Start: \(self.chosenPlaceStart.name)"
+                }
+            }
+            self.view.makeToast("Added to favorites", position: .center)
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default) { (action: UIAlertAction!) -> Void in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(addAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func waitTimeListener() {
+        isActivated = true
+        let estWTRef = self.ref.child("EST WAIT TIME")
+        estWTRef.observe(.value, with: { (snapshot) in
+            let postDict = snapshot.value as? NSDictionary
+            self.estWaitTime = postDict?["estimatedWT"] as? Int ?? 0
+            if (self.flag == "ON") {
+                let text = "Estimated Wait Time: \(String(describing: self.estWaitTime)) minutes"
+                self.estWTLbl.text = text
+            }
+        })
+    }
+    
+    func locationListener() {
+        let locRef = self.ref.child("LOCATIONS")
+        locRef.observe(.value, with: { (snapshot) in
+            self.locDB = LocationDatabase.init()
+            let enumerator = snapshot.children
+            while let loc = enumerator.nextObject() as? DataSnapshot {
+                let postDict = loc.value as? NSDictionary
+                let name = postDict?["name"] as? String ?? ""
+                let lat = postDict?["lat"] as? Double ?? 0
+                let lng = postDict?["long"] as? Double ?? 0
+                self.locDB.addLocation(name: name, lat: lat, lng: lng)
+            }
+            for key in self.favorites.keys {
+                let arr = self.favorites[key]
+                self.locDB.addLocation(name: key, lat: arr![0], lng: arr![1])
+            }
+            self.updateDropDown()
+        })
+    }
+    
+    func updateDropDown() {
+        var startNames = [String]()
+        var i = 0
+        startNames.append("My Location")
+        let names = self.locDB.getNames()
+        while i < names.count {
+            startNames.append(names[i])
+            i = i + 1
+        }
+        self.txtFieldStart.filterStrings(startNames)
+        self.txtFieldEnd.filterStrings(names)
     }
     
     func setupAutocomplete() {
@@ -128,6 +314,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         filter.type = .address
         autocompleteController.autocompleteFilter = filter
         autocompleteController.delegate = self
+        updateDropDown()
     }
     
     // INITIALIZE
@@ -139,17 +326,57 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 60).isActive=true
         
         addSubviewAnchorTLRH(subView: txtFieldStart, top: 10, left: 10, right: -10, height: 35)
+        txtFieldStart.setNeedsLayout()
+        txtFieldStart.layoutIfNeeded()
         setupTextField(textField: txtFieldStart, img: GMSMarker.markerImage(with: UIColor.green))
-        txtFieldStart.filterStrings(names)
         txtFieldStart.itemSelectionHandler = { (item, position) in
             self.toggleDim()
+            self.view.bringSubview(toFront: self.favStart)
             let name = item[position].title
             if (name == "Enter an Address") {
                 self.present(self.autocompleteController, animated: true, completion: nil)
                 self.setupAutocomplete()
+            } else if (name == "My Location") {
+                ToastManager.shared.style.activityBackgroundColor = UIColor.init(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.9)
+                ToastManager.shared.style.activityIndicatorColor = UIColor.init(red: 0/255, green: 0/255, blue: 0/255, alpha: 1.0)
+                self.view.makeToastActivity(.center)
+                self.view.endEditing(true)
+                self.view.isUserInteractionEnabled = false
+                var currentLocation: CLLocation!
+                if( CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+                    CLLocationManager.authorizationStatus() ==  .authorizedAlways){
+                    if (self.location.coordinate.latitude != 0) {
+                        currentLocation = self.location
+                        let lat = currentLocation.coordinate.latitude
+                        let long = currentLocation.coordinate.longitude
+                        if (AcesConfiguration().isInACESBoundary(lat: lat, long: long)) {
+                            self.getAddress(lat: lat, long: long)
+                        } else {
+                            let name = self.chosenPlaceStart.name
+                            if (name != "") {
+                                self.txtFieldStart.text = "Start: \(name)"
+                                let camera = GMSCameraPosition.camera(withLatitude: self.chosenPlaceStart.lat, longitude: self.chosenPlaceStart.long, zoom: 15)
+                                self.mapView.animate(to: camera)
+                            }
+                            self.view.hideToastActivity()
+                            self.view.isUserInteractionEnabled = true
+                            self.mapView.isUserInteractionEnabled = true
+                            self.txtFieldEnd.isEnabled = true
+                            self.view.endEditing(true)
+                            self.view.makeToast("Location Out of Bounds", position: .center)
+                        }
+                    }
+                } else {
+                    self.view.hideToastActivity()
+                    self.view.isUserInteractionEnabled = true
+                    self.mapView.isUserInteractionEnabled = true
+                    self.txtFieldEnd.isEnabled = true
+                    self.view.endEditing(true)
+                    self.showAlert(title: "Location Services Disabled", msg: "Please enable location services to use the 'My Location' feature")
+                }
             } else {
-                let lat = self.places[name]![0]
-                let long = self.places[name]![1]
+                let lat = self.locDB.getPlaces()[name]![0]
+                let long = self.locDB.getPlaces()[name]![1]
                 let camera = GMSCameraPosition.camera(withLatitude: lat, longitude: long, zoom: 15)
                 self.mapView.animate(to: camera)
                 self.chosenPlaceStart = MyPlace(name: name, lat: lat, long: long)
@@ -160,21 +387,28 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                 self.mapView.isUserInteractionEnabled = true
                 self.txtFieldEnd.isEnabled = true
                 self.view.endEditing(true)
+                if (self.favorites[self.chosenPlaceStart.name] != nil) {
+                    self.setStar(name: self.chosenPlaceStart.name, v: self.favStart)
+                } else {
+                    self.favStart.isHidden = true
+                }
             }
         }
         
         addSubviewAnchorTLRH(subView: txtFieldEnd, top: 50, left: 10, right: -10, height: 35)
+        txtFieldEnd.setNeedsLayout()
+        txtFieldEnd.layoutIfNeeded()
         setupTextField(textField: txtFieldEnd, img: GMSMarker.markerImage(with: UIColor.red))
-        txtFieldEnd.filterStrings(names)
         txtFieldEnd.itemSelectionHandler = { (item, position) in
             self.toggleDim()
+            self.view.bringSubview(toFront: self.favEnd)
             let name = item[position].title
             if (name == "Enter an Address") {
                 self.present(self.autocompleteController, animated: true, completion: nil)
                 self.setupAutocomplete()
             } else {
-                let lat = self.places[name]![0]
-                let long = self.places[name]![1]
+                let lat = self.locDB.getPlaces()[name]![0]
+                let long = self.locDB.getPlaces()[name]![1]
                 let camera = GMSCameraPosition.camera(withLatitude: lat, longitude: long, zoom: 15)
                 self.mapView.animate(to: camera)
                 self.chosenPlaceEnd = MyPlace(name: name, lat: lat, long: long)
@@ -185,6 +419,11 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                 self.mapView.isUserInteractionEnabled = true
                 self.txtFieldStart.isEnabled = true
                 self.view.endEditing(true)
+                if (self.favorites[self.chosenPlaceEnd.name] != nil) {
+                    self.setStar(name: self.chosenPlaceEnd.name, v: self.favEnd)
+                } else {
+                    self.favEnd.isHidden = true
+                }
             }
         }
         
@@ -192,6 +431,50 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         addSubviewAnchorBLRH(subView: numRidersBtn, btm: -50, left: 10, right: -10, height: 35)
         self.view.addSubview(toggleRidersBtn)
         addSubviewAnchorBLRH(subView: ridersSelector, btm: -50, left: 10, right: -10, height: 100)
+        addSubviewAnchorBLRH(subView: estWTLbl, btm: -90, left: 10, right: -10, height: 35)
+    }
+    
+    func getAddress(lat: Double, long: Double) -> Void {
+        var postalAddress = ""
+        GMSGeocoder().reverseGeocodeCoordinate(CLLocationCoordinate2DMake(lat, long), completionHandler: {response,error in
+            if let gmsAddress: GMSAddress = response!.firstResult(){
+                for line in  gmsAddress.lines! {
+                    postalAddress += line + " "
+                }
+                postalAddress = postalAddress.replacingOccurrences(of: ", Rock Island", with: "")
+                postalAddress = postalAddress.replacingOccurrences(of: ", IL", with: "")
+                postalAddress = postalAddress.replacingOccurrences(of: " 61201", with: "")
+                postalAddress = postalAddress.replacingOccurrences(of: ", USA", with: "")
+                postalAddress = postalAddress.replacingOccurrences(of: ".", with: "")
+                if (postalAddress.lowercased() == "unnamed road ") {
+                    let name = self.chosenPlaceStart.name
+                    if (name != "") {
+                        self.txtFieldStart.text = "Start: \(name)"
+                        let camera = GMSCameraPosition.camera(withLatitude: self.chosenPlaceStart.lat, longitude: self.chosenPlaceStart.long, zoom: 15)
+                        self.mapView.animate(to: camera)
+                    }
+                    self.view.hideToastActivity()
+                    self.view.isUserInteractionEnabled = true
+                    self.mapView.isUserInteractionEnabled = true
+                    self.txtFieldEnd.isEnabled = true
+                    self.view.endEditing(true)
+                    self.view.makeToast("Unknown Location", position: .center)
+                } else {
+                    let camera = GMSCameraPosition.camera(withLatitude: lat, longitude: long, zoom: 15)
+                    self.mapView.animate(to: camera)
+                    self.chosenPlaceStart = MyPlace(name: postalAddress, lat: lat, long: long)
+                    self.markerStart.map = self.mapView
+                    self.markerStart.position = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                    self.markerStart.title = "Start: \(postalAddress)"
+                    self.txtFieldStart.text = "Start: \(postalAddress)"
+                    self.mapView.isUserInteractionEnabled = true
+                    self.txtFieldEnd.isEnabled = true
+                    self.view.isUserInteractionEnabled = true
+                    self.setStar(name: self.chosenPlaceStart.name, v: self.favStart)
+                }
+            }
+            self.view.hideToastActivity()
+        })
     }
     
     // Add and anchor (to the top, left, right, height) a subview with the given constraints to the view
@@ -249,6 +532,14 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                     self.message = "\(customMsg)\n\n---------Hours---------\nFall Term: 7pm - 2am\nWinter Term: 6pm - 2am\nSpring Term: 7pm-2am"
                 }
                 self.showAlert(title: "ACES Offline", msg: self.message)
+                self.estWTLbl.text = "ACES Offline"
+            } else {
+                if (!self.isActivated) {
+                    self.waitTimeListener()
+                } else {
+                    let text = "Estimated Wait Time: \(String(describing: self.estWaitTime)) minutes"
+                    self.estWTLbl.text = text
+                }
             }
         })
         let email = appDelegate.getEmail().replacingOccurrences(of: ".", with: ",")
@@ -276,12 +567,15 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             let time = postDict?["time"] as? String ?? ""
             let timestamp = postDict?["timestamp"] as? CLong ?? 0
             let waitTime = postDict?["waitTime"] as? String ?? ""
-            self.ride = RideInfo(email: email, end: end, endTime: endTime, eta: eta, numRiders: numRiders, start: start, time: time, waitTime: waitTime, ts: timestamp, token: appDelegate.getToken())
+            let vehicle = postDict?["vehicle"] as? String ?? ""
+            self.ride = RideInfo(email: email, end: end, endTime: endTime, eta: eta, numRiders: numRiders, start: start, time: time, waitTime: waitTime, ts: timestamp, token: appDelegate.getToken(), vehicle: vehicle)
             let nextView: RequestedRideView = RequestedRideView()
             nextView.ride = self.ride
             nextView.delegate = self
             self.present(nextView, animated: true, completion: nil)
         }; if (count == 2) {
+            mapView.hideToastActivity()
+            self.view.isUserInteractionEnabled = true
             txtFieldStart.isEnabled = true
             txtFieldEnd.isEnabled = true
             mapView.isUserInteractionEnabled = true
@@ -296,7 +590,9 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        //TODO what to do with this?
+        if (locations.count > 0) {
+            location = locations.last ?? CLLocation(latitude: 0, longitude: 0)
+        }
     }
     
     // MAP VIEW
@@ -370,6 +666,8 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             cancelEditing()
             toggleDim()
         }
+        view.bringSubview(toFront: favStart)
+        view.bringSubview(toFront: favEnd)
     }
     
     // GMS Autocomplete
@@ -379,7 +677,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         if (AcesConfiguration().isInACESBoundary(lat: lat, long: long)) {
             let camera = GMSCameraPosition.camera(withLatitude: lat, longitude: long, zoom: 15)
             mapView.camera = camera
-            let name = place.name
+            let name = place.name.replacingOccurrences(of: ".", with: "")
             
             if (activeTextField == txtFieldStart) {
                 chosenPlaceStart = MyPlace(name: name, lat: lat, long: long)
@@ -389,6 +687,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                 markerStart.map = mapView
                 activeTextField.text = "Start: \(name)"
                 txtFieldEnd.isEnabled = true
+                setStar(name: chosenPlaceStart.name, v: favStart)
             } else {
                 chosenPlaceEnd = MyPlace(name: name, lat: lat, long: long)
                 markerEnd.map = nil
@@ -397,6 +696,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                 markerEnd.map = mapView
                 activeTextField.text = "End: \(name)"
                 txtFieldStart.isEnabled = true
+                setStar(name: chosenPlaceEnd.name, v: favEnd)
             }
             mapView.isUserInteractionEnabled = true
         } else {
@@ -478,27 +778,27 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             } else {
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 let email = appDelegate.getEmail().replacingOccurrences(of: ".", with: ",")
-                let end = chosenPlaceEnd.name
+                var end = chosenPlaceEnd.name
                 let numRiders = riders[ridersSelector.selectedRow(inComponent: 0)]
-                let start = chosenPlaceStart.name
+                var start = chosenPlaceStart.name
                 let formatter = DateFormatter()
                 formatter.dateFormat = "M/d/yyyy h:mm aaa"
                 let time = formatter.string(from: Date())
                 let ts = Date().toMillis()
                 let token = appDelegate.getToken()
                 
-                ride = RideInfo(email: email, end: end, endTime: " ", eta: " ", numRiders: numRiders, start: start, time: time, waitTime: "1000", ts: ts, token: token)
+                if (favorites[start] != nil) {
+                    let arr = start.split(separator: "-")
+                    start = arr[arr.count-1].trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                if (favorites[end] != nil) {
+                    let arr = end.split(separator: "-")
+                    end = arr[arr.count-1].trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                
+                ride = RideInfo(email: email, end: end, endTime: " ", eta: " ", numRiders: numRiders, start: start, time: time, waitTime: "1000", ts: ts, token: token, vehicle: " ")
                 let user = self.ref.child("PENDING RIDES").child(email)
-                user.child("email").setValue(email)
-                user.child("end").setValue(end)
-                user.child("endTime").setValue(" ")
-                user.child("eta").setValue(" ")
-                user.child("numRiders").setValue(numRiders)
-                user.child("start").setValue(start)
-                user.child("time").setValue(time)
-                user.child("waitTime").setValue("1000")
-                user.child("timestamp").setValue(ts)
-                user.child("token").setValue(token)
+                user.setValue(["email": email, "end": end, "endTime": " ", "eta": " ", "numRiders": numRiders, "start": start, "time": time, "waitTime": "1000", "timestamp": ts, "token": token, "vehicle": " "])
                 
                 let nextView: RequestedRideView = RequestedRideView()
                 nextView.ride = ride
@@ -519,15 +819,29 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     func setRide(ride: RideInfo) {
         txtFieldStart.text = ""
         txtFieldEnd.text = ""
+        favStart.isHidden = true
+        favEnd.isHidden = true
         chosenPlaceStart = MyPlace(name: "", lat: 0, long: 0)
         chosenPlaceEnd = MyPlace(name: "", lat: 0, long: 0)
         numRidersBtn.setTitle("Number of Riders: 1", for: UIControlState.normal)
         ridersSelector.selectRow(0, inComponent: 0, animated: false)
         initToasts(endTime: ride.getEndTime())
-        self.ride = RideInfo(email: "",end: "",endTime: "",eta: "",numRiders: "",start: "",time: "",waitTime: "",ts: 0,token: "")
+        self.ride = RideInfo(email: "",end: "",endTime: "",eta: "",numRiders: "",start: "",time: "",waitTime: "",ts: 0,token: "",vehicle: "")
         self.mapView.clear()
         let camera = GMSCameraPosition.camera(withLatitude: 41.505199, longitude: -90.550674, zoom: 15)
         self.mapView.camera = camera
+    }
+    
+    func setStar(name: String, v: UIImageView) {
+        view.bringSubview(toFront: v)
+        v.isHidden = false
+        if (favorites[name] == nil) {
+            let path = Bundle.main.path(forResource: "btn_star_big_off", ofType: "png", inDirectory: "Images")
+            v.image = UIImage(named: path!)
+        } else {
+            let path = Bundle.main.path(forResource: "btn_star_big_on", ofType: "png", inDirectory: "Images")
+            v.image = UIImage(named: path!)
+        }
     }
     
     // Returns whether or not file timestamp.txt exists
@@ -571,6 +885,46 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         DispatchQueue.main.async(execute: {
             self.present(alert, animated: true, completion: nil)
         })
+    }
+    
+    func addFavoriteToDropDownAndDatabase(name: String, lat: Double, long: Double) {
+        locDB.addLocation(name: name, lat: lat, lng: long)
+        updateDropDown()
+    }
+    
+    func removeFavoriteFromDropDownAndDatabase(name: String) {
+        locDB.removeLocation(name: name)
+        updateDropDown()
+    }
+    
+    func getFavorites() {
+        let preferences = UserDefaults.standard
+        let favs = preferences.string(forKey: "favorites") ?? "none"
+        let places = favs.split(separator: ",")
+        if (favs != "none") {
+            for place in places {
+                let arr = place.split(separator: ":")
+                if (arr.count == 3) {
+                    favorites[String(arr[0])] = [Double(arr[1]), Double(arr[2])] as? [Double]
+                    print("Loaded: \(arr[0])")
+                }
+            }
+        }
+    }
+    
+    func saveFavorites() {
+        let preferences = UserDefaults.standard
+        if (favorites.capacity > 0) {
+            var builder = ""
+            for (key, value) in favorites {
+                builder.append("\(key):\(value[0]):\(value[1]),")
+            }
+            print("saved: \(builder)")
+            preferences.set(builder, forKey: "favorites")
+        } else {
+            preferences.set("none", forKey: "favorites")
+        }
+        preferences.synchronize()
     }
     
 }

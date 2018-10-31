@@ -24,6 +24,9 @@
 		4ED0A9C120D57C0A00C17E69 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */; };
 		4ED0A9C320D57CAF00C17E69 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 4ED0A9C220D57CAF00C17E69 /* Images */; };
 		5DD0C966FFC29AD176513704 /* Pods_AcesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8888B00E63606125EC88D7 /* Pods_AcesTests.framework */; };
+		77457B7C21729803003A8F7E /* animo_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 77457B7B21729803003A8F7E /* animo_light.ttf */; };
+		774FF152213A1A1100246B8E /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774FF151213A1A1100246B8E /* PrivacyView.swift */; };
+		77F0558D215B353C0026F0DF /* RCValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F0558C215B353C0026F0DF /* RCValues.swift */; };
 		C90A0337A80EEF44436F5045 /* Pods_Aces.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D39A9286FF91058CA29C96BF /* Pods_Aces.framework */; };
 		F3D1EDB4063B1A0A9D8AA1D2 /* Pods_AcesUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFA3A541D0B803F002575A9E /* Pods_AcesUITests.framework */; };
 /* End PBXBuildFile section */
@@ -73,6 +76,9 @@
 		666AD8520D3169C72A28EF09 /* Pods-Aces.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Aces.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Aces/Pods-Aces.debug.xcconfig"; sourceTree = "<group>"; };
 		6D4E060E3CFD0C928E1CD8D8 /* Pods-AcesUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AcesUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AcesUITests/Pods-AcesUITests.release.xcconfig"; sourceTree = "<group>"; };
 		7703525BEC911AD2262AA9F7 /* Pods-AcesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AcesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AcesTests/Pods-AcesTests.release.xcconfig"; sourceTree = "<group>"; };
+		77457B7B21729803003A8F7E /* animo_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = animo_light.ttf; sourceTree = "<group>"; };
+		774FF151213A1A1100246B8E /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
+		77F0558C215B353C0026F0DF /* RCValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCValues.swift; sourceTree = "<group>"; };
 		C39DEC1BEC764977A6DE4E86 /* Pods-AcesUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AcesUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AcesUITests/Pods-AcesUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		C48C914F5C19D7FED4889FAA /* Pods-AcesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AcesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AcesTests/Pods-AcesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CFA3A541D0B803F002575A9E /* Pods_AcesUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AcesUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,6 +140,7 @@
 		4E56783620D2B4C50075FA9C /* Aces */ = {
 			isa = PBXGroup;
 			children = (
+				77457B7A217297B9003A8F7E /* fonts */,
 				4E6949CA2108DFAA006BC4D5 /* Aces.entitlements */,
 				4ED0A9C020D57C0A00C17E69 /* GoogleService-Info.plist */,
 				4E56783720D2B4C50075FA9C /* AppDelegate.swift */,
@@ -149,6 +156,8 @@
 				4E56784320D2B4C60075FA9C /* LaunchScreen.storyboard */,
 				4E56784620D2B4C60075FA9C /* Info.plist */,
 				4E56783E20D2B4C50075FA9C /* Aces.xcdatamodeld */,
+				774FF151213A1A1100246B8E /* PrivacyView.swift */,
+				77F0558C215B353C0026F0DF /* RCValues.swift */,
 			);
 			path = Aces;
 			sourceTree = "<group>";
@@ -169,6 +178,14 @@
 				4E56785C20D2B4C60075FA9C /* Info.plist */,
 			);
 			path = AcesUITests;
+			sourceTree = "<group>";
+		};
+		77457B7A217297B9003A8F7E /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				77457B7B21729803003A8F7E /* animo_light.ttf */,
+			);
+			path = fonts;
 			sourceTree = "<group>";
 		};
 		C3AF3052C42207B19C22EDCE /* Frameworks */ = {
@@ -268,6 +285,9 @@
 					4E56783320D2B4C50075FA9C = {
 						CreatedOnToolsVersion = 9.4.1;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
 							com.apple.Push = {
 								enabled = 1;
 							};
@@ -312,6 +332,7 @@
 				4E56784520D2B4C60075FA9C /* LaunchScreen.storyboard in Resources */,
 				4ED0A9C120D57C0A00C17E69 /* GoogleService-Info.plist in Resources */,
 				4E56784220D2B4C60075FA9C /* Assets.xcassets in Resources */,
+				77457B7C21729803003A8F7E /* animo_light.ttf in Resources */,
 				4E56783D20D2B4C50075FA9C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -456,7 +477,9 @@
 				4E56783820D2B4C50075FA9C /* AppDelegate.swift in Sources */,
 				4ED0A9BB20D4B54E00C17E69 /* RequestedRideView.swift in Sources */,
 				4EC759A320DC2BAB0052827D /* LocationDatabase.swift in Sources */,
+				77F0558D215B353C0026F0DF /* RCValues.swift in Sources */,
 				4E56784020D2B4C50075FA9C /* Aces.xcdatamodeld in Sources */,
+				774FF152213A1A1100246B8E /* PrivacyView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,17 +656,18 @@
 				CODE_SIGN_ENTITLEMENTS = Aces/Aces.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9Y69934FFE;
+				DEVELOPMENT_TEAM = 2U65PB4KJG;
 				INFOPLIST_FILE = Aces/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.aces;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.aces1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -655,17 +679,18 @@
 				CODE_SIGN_ENTITLEMENTS = Aces/Aces.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9Y69934FFE;
+				DEVELOPMENT_TEAM = 2U65PB4KJG;
 				INFOPLIST_FILE = Aces/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.aces;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.aces1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

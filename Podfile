@@ -17,6 +17,7 @@ pod 'GooglePlaces'
 pod 'Toast-Swift'
 pod 'Firebase/Database'
 pod 'SearchTextField'
+pod 'Firebase/RemoteConfig'
 
   target 'AcesTests' do
     inherit! :search_paths

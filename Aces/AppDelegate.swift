@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import Firebase
+import FirebaseRemoteConfig
 import GoogleSignIn
 import GoogleMaps
 import GooglePlaces
@@ -32,9 +33,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
     var email: String = ""
     var token: String = " "
     let gcmMessageIDKey = "gcm.message_id"
+    var needUpdate: Bool = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
+        let _ = RCValues.sharedInstance
+        
         Messaging.messaging().delegate = self
         if #available(iOS 10.0, *) {
             // For iOS 10 display notification (sent via APNS)
@@ -53,8 +57,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
         // Configure Firebase and Google services
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         GIDSignIn.sharedInstance().delegate = self
-        GMSServices.provideAPIKey("")
-        GMSPlacesClient.provideAPIKey("")
+        GMSServices.provideAPIKey("AIzaSyDUqQnGX_oZrUXCRwxETyY6DpTa90I4mZ8")
+        GMSPlacesClient.provideAPIKey("AIzaSyDUqQnGX_oZrUXCRwxETyY6DpTa90I4mZ8")
         return true
     }
     
@@ -110,6 +114,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
                                                      annotation: [:])
     }
     
+    func triggerFetched() {
+        let updateRequired = RemoteConfig.remoteConfig().configValue(forKey: "force_update_required").boolValue
+        if (updateRequired) {
+            let cloudVersion = RemoteConfig.remoteConfig()
+                .configValue(forKey: "force_update_version_ios")
+                .stringValue?
+                .replacingOccurrences(of: ".", with: "")
+            let currentVersion = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+            let cloudNum: Int = Int(cloudVersion!)! // firstText is UITextField
+            let currentNum: Int = Int(currentVersion.replacingOccurrences(of: ".", with: ""))!
+            if (currentNum < cloudNum) {
+                self.window?.rootViewController?.view.isUserInteractionEnabled = false
+                updateAlert()
+                needUpdate = true
+            }
+        }
+    }
+    
+    func updateAlert() {
+        let alert = UIAlertController(title: "New Version Available", message: "Please update the app to the newest version.", preferredStyle: UIAlertControllerStyle.alert)
+        let update = UIAlertAction(title: "Update", style: UIAlertActionStyle.default, handler: { action in
+            let link = "https://itunes.apple.com/us/app/aces-augustana-college/id1437441626?ls=1&mt=8"
+            if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: {(success: Bool) in
+                    if success {
+                        print("Launch successful")
+                    }
+                })
+            }
+        })
+        alert.addAction(update)
+        DispatchQueue.main.async(execute: {
+            self.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        })
+    }
+    
     func getEmail() -> String {
         return email
     }
@@ -126,10 +166,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        NSLog("background")
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        if (needUpdate) {
+            self.window?.rootViewController?.view.isUserInteractionEnabled = false
+            updateAlert()
+        }
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -203,7 +248,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
         print("deviceTokenString: \(deviceTokenString)")
-        //self.apnsToken = deviceTokenString
         
         //set apns token in messaging
         Messaging.messaging().apnsToken = deviceToken

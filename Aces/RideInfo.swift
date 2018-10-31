@@ -21,8 +21,9 @@ class RideInfo {
     private var waitTime: String
     private var ts: CLong
     private var token: String
+    private var vehicle: String
     
-    init(email: String, end: String, endTime: String, eta: String, numRiders: String, start: String, time: String, waitTime: String, ts: CLong, token: String) {
+    init(email: String, end: String, endTime: String, eta: String, numRiders: String, start: String, time: String, waitTime: String, ts: CLong, token: String, vehicle: String) {
         self.email = email
         self.end = end
         self.endTime = endTime
@@ -33,6 +34,7 @@ class RideInfo {
         self.waitTime = waitTime
         self.ts = ts
         self.token = token
+        self.vehicle = vehicle
     }
     
     func getEmail() -> String {
@@ -113,5 +115,13 @@ class RideInfo {
     
     func setToken(token: String) {
         self.token = token
+    }
+    
+    func getVehicle() -> String {
+        return vehicle
+    }
+    
+    func setVehicle(vehicle: String) {
+        self.vehicle = vehicle
     }
 }

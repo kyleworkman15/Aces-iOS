@@ -28,7 +28,7 @@ class AboutView: UIViewController, UITextViewDelegate {
     // View did load
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor.init(red: 0/255, green: 90/255, blue: 210/255, alpha: 1)
+        self.view.backgroundColor = UIColor.init(red: 32/255, green: 85/255, blue: 138/255, alpha: 1)
         backBtn.addTarget(self, action: #selector(backAction), for: .touchUpInside)
         
         displayText()
@@ -42,7 +42,7 @@ class AboutView: UIViewController, UITextViewDelegate {
             .link: NSURL(string: "mailto:\("acesdispatcher@augustana.edu")")!,
             .foregroundColor: UIColor.blue
         ]
-        let attributedString = NSMutableAttributedString(string: "Augustana College Express Service (ACES)\n\nPlease email any problems, bugs, or suggestions here! Thanks!\n\nPurpose:\nTo provide safe transportation around campus for students. We strive to make ACES a fun and safe option to get across campus, most importantly to prevent students from walking alone at night.\n\nHours:\nFall Term: 7pm - 2am\nWinter Term: 6pm - 2am\nSpring Term: 7pm - 2am\n\nPhone:\n309-794-7550\n\nCredit:\nAardvark Image: Courtesy of Abraham Williams (CC BY-SA 2.0)\nACES Logo: Courtesy of ACES\n\nDev:\nKyle Workman")
+        let attributedString = NSMutableAttributedString(string: "Augustana College Express Service (ACES)\n\nPlease email any problems, bugs, or suggestions here! Thanks!\n\nPurpose:\nTo provide safe transportation around campus for students. We strive to make ACES a fun and safe option to get across campus, most importantly to prevent students from walking alone at night.\n\nHours:\nFall Term: 7pm - 2am\nWinter Term: 6pm - 2am\nSpring Term: 7pm - 2am\n\nPhone:\n309-794-7550\n\nCredit:\nACES Logo: Courtesy of ACES\n\nDev:\nKyle Workman")
         attributedString.setAttributes(linkAttributes, range: NSMakeRange(90, 4))
         self.textView.delegate = self
         self.textView.attributedText = attributedString

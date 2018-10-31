@@ -5,6 +5,10 @@ This application makes use of the following third party libraries:
 
 Copyright 2018 Google
 
+## FirebaseABTesting
+
+Copyright 2018 Google
+
 ## FirebaseAnalytics
 
 Copyright 2018 Google
@@ -836,6 +840,10 @@ Copyright 2018 Google
    See the License for the specific language governing permissions and
    limitations under the License.
 
+
+## FirebaseRemoteConfig
+
+Copyright 2018 Google
 
 ## GTMOAuth2
 

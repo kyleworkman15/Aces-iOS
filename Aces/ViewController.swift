@@ -15,6 +15,7 @@ import GoogleSignIn
 import GoogleMaps
 import Toast_Swift
 import SearchTextField
+import SpriteKit
 
 // Methods for constructing elements based on application's style
 func constructTitleLbl(text: String, txtColor: UIColor, bkdColor: UIColor) -> UILabel{
@@ -42,12 +43,18 @@ func constructBtn(text: String, color: UIColor) -> UIButton{
 func constructLbl(text: String) -> UILabel {
     let lbl = UILabel()
     lbl.text = text
-    lbl.font = UIFont.boldSystemFont(ofSize: 20)
-    lbl.textColor = UIColor.init(red: 0/255, green: 90/255, blue: 210/255, alpha: 1)
-    lbl.backgroundColor = UIColor.init(red: 255/255, green: 215/255, blue: 0/255, alpha: 1)
+    lbl.textColor = UIColor.init(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
     lbl.textAlignment = .center
     lbl.translatesAutoresizingMaskIntoConstraints=false
     lbl.numberOfLines = 0
+    guard let customFont = UIFont(name: "Animo-Light", size: 22) else {
+        fatalError("""
+        Failed to load the "animo_light.ttf" font.
+        """
+        )
+    }
+    lbl.font = customFont
+    lbl.adjustsFontSizeToFitWidth = true
     return lbl
 }
 
@@ -68,19 +75,15 @@ func constructSearchFld(text: String) -> SearchTextField {
     return tf
 }
 
-func constructLogo(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) -> UIImageView {
-    let acesLogo = "aces_image"
+func constructLogo(path: String) -> UIImageView {
+    let acesLogo = path
     let acesPath = Bundle.main.path(forResource: acesLogo, ofType: "png", inDirectory: "Images")
     let image = UIImage(named: acesPath!)
     let imageView = UIImageView(image: image)
-    imageView.frame = CGRect(x: x, y: y, width: width, height: height)
     return imageView
 }
 
 class ViewController: UIViewController, GIDSignInUIDelegate {
-    
-    // Label for the title
-    let titleLbl: UILabel = constructTitleLbl(text: "Augustana College\nExpress Service", txtColor: UIColor.init(red: 0/255, green: 90/255, blue: 210/255, alpha: 1), bkdColor: UIColor.init(red: 255/255, green: 215/255, blue: 0/255, alpha: 1)) //0,90,210
     
     // Button for transitioning to the About Page
     let aboutBtn: UIButton = constructBtn(text: "?", color: .lightGray)
@@ -88,25 +91,48 @@ class ViewController: UIViewController, GIDSignInUIDelegate {
     // View did load
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.init(red: 0/255, green: 90/255, blue: 210/255, alpha: 1)
+        view.backgroundColor = UIColor.init(red: 32/255, green: 85/255, blue: 138/255, alpha: 1)
         aboutBtn.addTarget(self, action: #selector(aboutAction), for: .touchUpInside)
         let screenSize = UIScreen.main.bounds
         
         addGoogleBtn()
-        addSubviewAnchorTLRH(subView: titleLbl, top: screenSize.height/15, left: 0, right: 0, height: 100)
+        let title = constructLogo(path: "aces_title")
+        title.translatesAutoresizingMaskIntoConstraints = false
+        addSubviewAnchorTLRH(subView: title, top: screenSize.height/15, left: 20, right: -20, height: 15*screenSize.height/100)
         addSubviewAnchorBRWH(subView: aboutBtn, btm: -110, right: -20, width: 40, height: 40)
         let width = screenSize.width
         let height = screenSize.height
-        view.addSubview(constructLogo(x: (width/2)-(5*width/8/2), y: (height/2)-(5*width/8/2), width: 5*width/8, height: 5*width/8))
+        let logo = constructLogo(path: "aces_image")
+        logo.frame = CGRect(x: (width/2)-(5*width/8/2), y: (height/2)-(5*width/8/2), width: 5*width/8, height: 5*width/8)
+        view.addSubview(logo)
     }
     
     // Construct and add the Google sign in button to the view
     func addGoogleBtn() {
         let googleButton = GIDSignInButton()
+        googleButton.translatesAutoresizingMaskIntoConstraints=false
         googleButton.addTarget(self, action: #selector(loginAction), for: .touchUpInside)
-        googleButton.frame = CGRect(x: 16, y: view.frame.maxY - 100, width: view.frame.width - 32, height: 50)
+        addSubviewAnchorBRWH(subView: googleButton, btm: -50, right: -10, width: view.frame.width - 20, height: 35)
         view.addSubview(googleButton)
         GIDSignIn.sharedInstance().uiDelegate = self
+  
+        let privacyLink = UILabel()
+        privacyLink.attributedText = NSAttributedString(string: "By signing in, you agree to our Privacy Policy", attributes:[.underlineStyle: NSUnderlineStyle.styleSingle.rawValue])
+        privacyLink.textColor = UIColor.init(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        privacyLink.backgroundColor = UIColor.init(red: 32/255, green: 85/255, blue: 138/255, alpha: 1)
+        privacyLink.textAlignment = .center
+        privacyLink.translatesAutoresizingMaskIntoConstraints=false
+        privacyLink.numberOfLines = 0
+        privacyLink.isUserInteractionEnabled = true
+        privacyLink.adjustsFontSizeToFitWidth = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.tapFunction))
+        privacyLink.addGestureRecognizer(tap)
+        addSubviewAnchorBRWH(subView: privacyLink, btm: -20, right: 0, width: view.frame.width, height: 20)
+    }
+    
+    @objc
+    func tapFunction(sender:UITapGestureRecognizer) {
+        self.present(PrivacyView(), animated: true, completion: nil)
     }
     
     // Add and anchor (to the top, left, right, height) a subview with the given constraints to the view

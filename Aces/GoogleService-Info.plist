@@ -7,9 +7,9 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>691410651327-qmv3m1ag26vck8t60rks5lmra3uaks0u.apps.googleusercontent.com</string>
+	<string>691410651327-59l5rqj5u984a36jcf4u00jo56c9tkl3.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.691410651327-qmv3m1ag26vck8t60rks5lmra3uaks0u</string>
+	<string>com.googleusercontent.apps.691410651327-59l5rqj5u984a36jcf4u00jo56c9tkl3</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCZq4mtqvEH77v7TDPLIQ4T_PsZDA8JOCo</string>
 	<key>GCM_SENDER_ID</key>
@@ -17,7 +17,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>edu.augustana.aces</string>
+	<string>edu.augustana.aces1</string>
 	<key>PROJECT_ID</key>
 	<string>augustana-aces</string>
 	<key>STORAGE_BUCKET</key>
@@ -33,7 +33,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:691410651327:ios:8d1c6815f02cf635</string>
+	<string>1:691410651327:ios:744e426122ff7f42</string>
 	<key>DATABASE_URL</key>
 	<string>https://augustana-aces.firebaseio.com</string>
 </dict>
