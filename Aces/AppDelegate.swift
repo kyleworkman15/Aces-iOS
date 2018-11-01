@@ -57,8 +57,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
         // Configure Firebase and Google services
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         GIDSignIn.sharedInstance().delegate = self
-        GMSServices.provideAPIKey("AIzaSyDUqQnGX_oZrUXCRwxETyY6DpTa90I4mZ8")
-        GMSPlacesClient.provideAPIKey("AIzaSyDUqQnGX_oZrUXCRwxETyY6DpTa90I4mZ8")
+        GMSServices.provideAPIKey("")
+        GMSPlacesClient.provideAPIKey("")
         return true
     }
     
