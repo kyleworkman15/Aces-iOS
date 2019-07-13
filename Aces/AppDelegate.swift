@@ -59,16 +59,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
         GIDSignIn.sharedInstance().delegate = self
         GMSServices.provideAPIKey("")
         GMSPlacesClient.provideAPIKey("")
+        if GIDSignIn.sharedInstance().hasAuthInKeychain() {
+            let mainStoryboardIpad : UIStoryboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
+            let initialViewControlleripad : UIViewController = mainStoryboardIpad.instantiateViewController(withIdentifier: "launch") as UIViewController
+            self.window = UIWindow(frame: UIScreen.main.bounds)
+            self.window?.rootViewController = initialViewControlleripad
+            self.window?.makeKeyAndVisible()
+            GIDSignIn.sharedInstance().signInSilently()
+        } else {
+            let mainStoryboardIpad : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let initialViewControlleripad : UIViewController = mainStoryboardIpad.instantiateViewController(withIdentifier: "signin") as UIViewController
+            self.window = UIWindow(frame: UIScreen.main.bounds)
+            self.window?.rootViewController = initialViewControlleripad
+            self.window?.makeKeyAndVisible()
+        }
         return true
     }
     
     // Handle Google/Firebase sign in
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if (!needUpdate) {
         // Cancelled Google sign in
         if let err = error {
-            print(err)
+            print("GOOGLE SIGN IN \(err)")
             self.window?.rootViewController?.view.hideToastActivity()
             self.window?.rootViewController?.view.isUserInteractionEnabled = true
+            if (!err.localizedDescription.contains("The user canceled")) {
+                displayConnectionError()
+            }
             return
         }
         
@@ -82,7 +100,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
             
             // Error authenticating with Firebase
             if let err = error {
-                print(err)
+                print("FIREBASE SIGN IN \(err)")
+                self.displayConnectionError()
                 return
             }
             
@@ -103,6 +122,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
                 self.window?.makeToast("Must login with Augustana email!", position: .bottom)
                 GIDSignIn.sharedInstance().signOut()
             }
+        })
+        }
+    }
+    
+    func displayConnectionError() {
+        let alert = UIAlertController(title: "Connection Error", message: "Please check your internet connection", preferredStyle: UIAlertControllerStyle.alert)
+        let action = UIAlertAction(title: "Retry", style: UIAlertActionStyle.default, handler: { (alert) -> Void in
+            if GIDSignIn.sharedInstance().hasAuthInKeychain() {
+                GIDSignIn.sharedInstance().signInSilently()
+            }
+        })
+        alert.addAction(action)
+        DispatchQueue.main.async(execute: {
+            self.window?.rootViewController?.present(alert, animated: true, completion: nil)
         })
     }
     
@@ -133,7 +166,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISearchBarDelegate, GIDS
     }
     
     func updateAlert() {
-        let alert = UIAlertController(title: "New Version Available", message: "Please update the app to the newest version.", preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController(title: "Required Update", message: "Please update the app to continue using ACES.", preferredStyle: UIAlertControllerStyle.alert)
         let update = UIAlertAction(title: "Update", style: UIAlertActionStyle.default, handler: { action in
             let link = "https://itunes.apple.com/us/app/aces-augustana-college/id1437441626?ls=1&mt=8"
             if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {

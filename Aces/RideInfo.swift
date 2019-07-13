@@ -19,11 +19,11 @@ class RideInfo {
     private var start: String
     private var time: String
     private var waitTime: String
-    private var ts: CLong
+    private var ts: Any
     private var token: String
     private var vehicle: String
     
-    init(email: String, end: String, endTime: String, eta: String, numRiders: String, start: String, time: String, waitTime: String, ts: CLong, token: String, vehicle: String) {
+    init(email: String, end: String, endTime: String, eta: String, numRiders: String, start: String, time: String, waitTime: String, ts: Any, token: String, vehicle: String) {
         self.email = email
         self.end = end
         self.endTime = endTime
@@ -101,11 +101,11 @@ class RideInfo {
         self.waitTime = waitTime
     }
     
-    func getTimestamp() -> CLong {
+    func getTimestamp() -> Any {
         return ts
     }
     
-    func setTimestamp(ts: CLong) {
+    func setTimestamp(ts: Any) {
         self.ts = ts
     }
     

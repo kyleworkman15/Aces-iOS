@@ -44,6 +44,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     var markerStart = GMSMarker()
     var markerEnd = GMSMarker()
     var riders = ["1", "2", "3", "4", "5", "6", "7"]
+    var doors = ["Front", "Back", "Side"]
     var ride: RideInfo = RideInfo(email: "",end: "",endTime: "",eta: "",numRiders: "",start: "",time: "",waitTime: "",ts: 0,token: "",vehicle: "")
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var autocompleteController = GMSAutocompleteViewController()
@@ -57,15 +58,27 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         return v
     }()
     
-    let txtFieldStart: SearchTextField = constructSearchFld(text: "Start Location")
+    let txtFieldStart: SearchTextField = constructSearchFld(text: "Start Location", color: UIColor.init(red: 218/255, green: 227/255, blue: 242/255, alpha: 1))
     
-    let txtFieldEnd: SearchTextField = constructSearchFld(text: "End Location")
+    let txtFieldEnd: SearchTextField = constructSearchFld(text: "End Location", color: UIColor.init(red: 253/255, green: 248/255, blue: 214/255, alpha: 1))
     
-    let requestBtn: UIButton = constructBtn(text: "Request Ride", color: UIColor.init(red: 170/255, green: 231/255, blue: 156/255, alpha: 1))
+    let requestBtn: UIButton = constructBtn(text: "Request Ride", color: UIColor.init(red: 244/255, green: 220/255, blue: 53/255, alpha: 1))
+    //UIColor.init(red: 106/255, green: 144/255, blue: 201/255, alpha: 1)
+    let numRidersBtn: UIButton = constructBtn(text: "Number of Riders: 1", color: UIColor.init(red: 218/255, green: 227/255, blue: 242/255, alpha: 1))
     
-    let numRidersBtn: UIButton = constructBtn(text: "Number of Riders: 1", color: .white)
+    let doorBtn: UIButton = constructBtn(text: "Pick-up Door: Front", color: UIColor.init(red: 218/255, green: 227/255, blue: 242/255, alpha: 1))
     
     let ridersSelector: UIPickerView = {
+        let picker = UIPickerView()
+        picker.backgroundColor = UIColor.init(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        picker.layer.borderColor = UIColor.darkGray.cgColor
+        picker.isHidden = true
+        picker.layoutIfNeeded()
+        picker.translatesAutoresizingMaskIntoConstraints=false
+        return picker
+    }()
+    
+    let doorSelector: UIPickerView = {
         let picker = UIPickerView()
         picker.backgroundColor = UIColor.init(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         picker.layer.borderColor = UIColor.darkGray.cgColor
@@ -118,6 +131,8 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         requestBtn.isEnabled = false
         numRidersBtn.addTarget(self, action: #selector(ridersAction), for: .touchUpInside)
         numRidersBtn.isEnabled = false
+        doorBtn.addTarget(self, action: #selector(doorAction), for: .touchUpInside)
+        doorBtn.isEnabled = false
         
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
@@ -130,8 +145,14 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         initGoogleMaps()
         locationListener()
         
-        markerStart.icon = GMSMarker.markerImage(with: UIColor.green)
-        markerEnd.icon = GMSMarker.markerImage(with: UIColor.red)
+        let markerImage = UIImage(named: "blue1")!.withRenderingMode(.alwaysOriginal)
+        let markerView = UIImageView(image: markerImage)
+        markerStart.iconView = markerView
+        let markerImage2 = UIImage(named: "gold1")!.withRenderingMode(.alwaysOriginal)
+        let markerView2 = UIImageView(image: markerImage2)
+        markerEnd.iconView = markerView2
+        //markerStart.icon = GMSMarker.markerImage(with: UIColor.init(red: 32/255, green: 85/255, blue: 138/255, alpha: 1))
+        //markerEnd.icon = GMSMarker.markerImage(with: UIColor.init(red: 244/255, green: 220/255, blue: 53/255, alpha: 1))
         
         txtFieldStart.delegate = self
         txtFieldStart.comparisonOptions = [.forcedOrdering, .caseInsensitive]
@@ -139,6 +160,8 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         txtFieldEnd.delegate = self
         ridersSelector.delegate = self
         ridersSelector.dataSource = self
+        doorSelector.delegate = self
+        doorSelector.dataSource = self
     }
     
     func setupFavStars() {
@@ -204,12 +227,13 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     
     func displayPopUpForFavorite(b: Bool) {
         let alertController = UIAlertController(title: "Add to Favorites", message: "Enter a nickname for the location. The location will be saved in the drop down box.", preferredStyle: UIAlertControllerStyle.alert)
-        alertController.addTextField(configurationHandler: { (textField: UITextField!) -> Void in
-            
+        alertController.addTextField(configurationHandler: { (textField: UITextField) -> Void in
+            textField.delegate = self
         })
         let addAction = UIAlertAction(title: "Add", style: UIAlertActionStyle.default, handler: { (alert) -> Void in
             let field = alertController.textFields![0] as UITextField
-            let favorite = field.text ?? ""
+            var favorite = field.text ?? ""
+            favorite = "* \(favorite)"
             if (b) {
                 let oldNameStr = self.chosenPlaceStart.name
                 let oldName = self.chosenPlaceStart.name.split(separator: "-")
@@ -230,7 +254,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             } else {
                 let oldNameStr = self.chosenPlaceEnd.name
                 let oldName = self.chosenPlaceEnd.name.split(separator: "-")
-                self.chosenPlaceEnd.name = "\(String(describing: favorite)) -\(oldName[oldName.count-1])"
+                self.chosenPlaceEnd.name = "\(String(describing: favorite)) - \(oldName[oldName.count-1].trimmingCharacters(in: .whitespacesAndNewlines))"
                 self.favorites[self.chosenPlaceEnd.name] = [self.chosenPlaceEnd.lat, self.chosenPlaceEnd.long]
                 self.addFavoriteToDropDownAndDatabase(name: self.chosenPlaceEnd.name, lat: self.chosenPlaceEnd.lat, long: self.chosenPlaceEnd.long)
                 self.saveFavorites()
@@ -253,6 +277,17 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         alertController.addAction(addAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let obj = textField as? SearchTextField {
+            return true
+        } else {
+            if string.count > 0, !"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789".contains(string) {
+                return false
+            }
+            return true
+        }
     }
     
     func waitTimeListener() {
@@ -328,9 +363,13 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         addSubviewAnchorTLRH(subView: txtFieldStart, top: 10, left: 10, right: -10, height: 35)
         txtFieldStart.setNeedsLayout()
         txtFieldStart.layoutIfNeeded()
-        setupTextField(textField: txtFieldStart, img: GMSMarker.markerImage(with: UIColor.green))
+        let markerImage = UIImage(named: "blue1")!.withRenderingMode(.alwaysOriginal)
+        let markerImage2 = UIImage(named: "gold1")!.withRenderingMode(.alwaysOriginal)
+        setupTextField(textField: txtFieldStart, img: markerImage)
         txtFieldStart.itemSelectionHandler = { (item, position) in
-            self.toggleDim()
+            if (!self.toggleRidersBtn.isHidden) {
+                self.toggleDim()
+            }
             self.view.bringSubview(toFront: self.favStart)
             let name = item[position].title
             if (name == "Enter an Address") {
@@ -398,9 +437,11 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         addSubviewAnchorTLRH(subView: txtFieldEnd, top: 50, left: 10, right: -10, height: 35)
         txtFieldEnd.setNeedsLayout()
         txtFieldEnd.layoutIfNeeded()
-        setupTextField(textField: txtFieldEnd, img: GMSMarker.markerImage(with: UIColor.red))
+        setupTextField(textField: txtFieldEnd, img: markerImage2)
         txtFieldEnd.itemSelectionHandler = { (item, position) in
-            self.toggleDim()
+            if (!self.toggleRidersBtn.isHidden) {
+                self.toggleDim()
+            }
             self.view.bringSubview(toFront: self.favEnd)
             let name = item[position].title
             if (name == "Enter an Address") {
@@ -429,9 +470,11 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         
         addSubviewAnchorBLRH(subView: requestBtn, btm: -10, left: 10, right: -10, height: 35)
         addSubviewAnchorBLRH(subView: numRidersBtn, btm: -50, left: 10, right: -10, height: 35)
+        addSubviewAnchorBLRH(subView: doorBtn, btm: -90, left: 10, right: -10, height: 35)
         self.view.addSubview(toggleRidersBtn)
-        addSubviewAnchorBLRH(subView: ridersSelector, btm: -50, left: 10, right: -10, height: 100)
-        addSubviewAnchorBLRH(subView: estWTLbl, btm: -90, left: 10, right: -10, height: 35)
+        addSubviewAnchorBLRH(subView: ridersSelector, btm: -50, left: 10, right: -10, height: 115)
+        addSubviewAnchorBLRH(subView: doorSelector, btm: -90, left: 10, right: -10, height: 115)
+        addSubviewAnchorBLRH(subView: estWTLbl, btm: -130, left: 10, right: -10, height: 35)
     }
     
     func getAddress(lat: Double, long: Double) -> Void {
@@ -511,9 +554,13 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         self.mapView.isMyLocationEnabled = true
     }
     
-    func initToasts(endTime: String) {
+    func initToasts(endTime: String, message: String) {
         if (endTime == "Cancelled by Dispatcher") {
-            showAlert(title: "Ride Cancelled", msg: "Requested ride cancelled by dispatcher.")
+            if (message == "") {
+                showAlert(title: "Ride Cancelled", msg: "Requested ride cancelled by dispatcher.")
+            } else {
+                showAlert(title: "Ride Cancelled", msg: "Requested ride cancelled by dispatcher:\n\(message)")
+            }
         } else if (endTime != "Cancelled by User" && ride.getETA() != " ") {
             self.view.makeToast("Thanks for using ACES!", position: .center)
         }
@@ -580,6 +627,7 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             txtFieldEnd.isEnabled = true
             mapView.isUserInteractionEnabled = true
             numRidersBtn.isEnabled = true
+            doorBtn.isEnabled = true
             requestBtn.isEnabled = true
         }
     }
@@ -613,22 +661,43 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return riders.count
+        if (pickerView == ridersSelector) {
+            return riders.count
+        } else {
+            return doors.count
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return riders[row]
+        if (pickerView == ridersSelector) {
+            return riders[row]
+        } else {
+            return doors[row]
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        toggleRiders()
-        numRidersBtn.setTitle("Number of Riders: \(riders[row])", for: UIControlState.normal)
+        if (pickerView == ridersSelector) {
+            toggleDim()
+            ridersSelector.isHidden = !ridersSelector.isHidden
+            numRidersBtn.setTitle("Number of Riders: \(riders[row])", for: UIControlState.normal)
+        } else {
+            toggleDim()
+            doorSelector.isHidden = !doorSelector.isHidden
+            doorBtn.setTitle("Pick-up Door: \(doors[row])", for: UIControlState.normal)
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        let newString = NSMutableAttributedString(string: riders[row])
-        newString.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.black, range: NSRange (location: 0, length: newString.length))
-        return newString
+        if (pickerView == ridersSelector) {
+            let newString = NSMutableAttributedString(string: riders[row])
+            newString.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.black, range: NSRange (location: 0, length: newString.length))
+            return newString
+        } else {
+            let newString = NSMutableAttributedString(string: doors[row])
+            newString.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.black, range: NSRange (location: 0, length: newString.length))
+            return newString
+        }
     }
     
     // TEXT FIELD
@@ -637,15 +706,22 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        return true
+        if let obj = textField as? SearchTextField {
+            return true
+        }
+        return false
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        toggleRiders()
+        if let obj = textField as? SearchTextField {
+            toggleRiders()
+            return true
+        }
         return true
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        if let obj = textField as? SearchTextField {
         textField.text = nil
         mapView.isUserInteractionEnabled = false
         view.bringSubview(toFront: toggleRidersBtn)
@@ -659,15 +735,18 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             txtFieldEnd.startVisibleWithoutInteraction = true
             txtFieldStart.isEnabled = false
         }
+        }
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
+        if let obj = textField as? SearchTextField {
         if (!toggleRidersBtn.isHidden) {
             cancelEditing()
             toggleDim()
         }
         view.bringSubview(toFront: favStart)
         view.bringSubview(toFront: favEnd)
+        }
     }
     
     // GMS Autocomplete
@@ -756,8 +835,10 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
             }
             mapView.isUserInteractionEnabled = true
             txtFieldStart.isEnabled = true
-        } else {
+        } else if (!ridersSelector.isHidden){
             ridersSelector.isHidden = !ridersSelector.isHidden
+        } else {
+            doorSelector.isHidden = !doorSelector.isHidden
         }
     }
     
@@ -780,11 +861,12 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                 let email = appDelegate.getEmail().replacingOccurrences(of: ".", with: ",")
                 var end = chosenPlaceEnd.name
                 let numRiders = riders[ridersSelector.selectedRow(inComponent: 0)]
+                let door = doors[doorSelector.selectedRow(inComponent: 0)]
                 var start = chosenPlaceStart.name
                 let formatter = DateFormatter()
                 formatter.dateFormat = "M/d/yyyy h:mm aaa"
                 let time = formatter.string(from: Date())
-                let ts = Date().toMillis()
+                let ts = ServerValue.timestamp()
                 let token = appDelegate.getToken()
                 
                 if (favorites[start] != nil) {
@@ -795,11 +877,25 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                     let arr = end.split(separator: "-")
                     end = arr[arr.count-1].trimmingCharacters(in: .whitespacesAndNewlines)
                 }
-                
+                start = start + " (\(door))"
+
                 ride = RideInfo(email: email, end: end, endTime: " ", eta: " ", numRiders: numRiders, start: start, time: time, waitTime: "1000", ts: ts, token: token, vehicle: " ")
                 let user = self.ref.child("PENDING RIDES").child(email)
-                user.setValue(["email": email, "end": end, "endTime": " ", "eta": " ", "numRiders": numRiders, "start": start, "time": time, "waitTime": "1000", "timestamp": ts, "token": token, "vehicle": " "])
-                
+                ref.child(email).setValue(ServerValue.timestamp())
+                ref.child(email).observeSingleEvent(of: .value, with: {(snapshot) in
+                    let df = DateFormatter()
+                    df.dateFormat = "dd-MM-yyyy hh:mm aa"
+                    print(snapshot.value as? Double ?? 0)
+                    df.timeZone = TimeZone(abbreviation: "CST6CDT")
+                    let time = snapshot.value as? Double ?? 0
+                    let date = Date(timeIntervalSince1970: time/1000)
+                    print(date)
+                    let stringDate = df.string(from: date)
+                    print(stringDate)
+                    self.ride.setTime(time: stringDate)
+                    user.setValue(["door": door, "email": email, "end": end, "endTime": " ", "eta": " ", "numRiders": numRiders, "start": start, "time": stringDate, "waitTime": "1000", "timestamp": ts, "token": token, "vehicle": " "])
+                    self.ref.child(email).removeValue()
+                })
                 let nextView: RequestedRideView = RequestedRideView()
                 nextView.ride = ride
                 nextView.delegate = self
@@ -811,12 +907,20 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
     }
     
     @objc func ridersAction() {
-        toggleRiders()
+        toggleDim()
+        ridersSelector.isHidden = !ridersSelector.isHidden
         view.bringSubview(toFront: toggleRidersBtn)
         view.bringSubview(toFront: ridersSelector)
     }
     
-    func setRide(ride: RideInfo) {
+    @objc func doorAction() {
+        toggleDim()
+        doorSelector.isHidden = !doorSelector.isHidden
+        view.bringSubview(toFront: toggleRidersBtn)
+        view.bringSubview(toFront: doorSelector)
+    }
+    
+    func setRide(ride: RideInfo, message: String) {
         txtFieldStart.text = ""
         txtFieldEnd.text = ""
         favStart.isHidden = true
@@ -825,7 +929,9 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
         chosenPlaceEnd = MyPlace(name: "", lat: 0, long: 0)
         numRidersBtn.setTitle("Number of Riders: 1", for: UIControlState.normal)
         ridersSelector.selectRow(0, inComponent: 0, animated: false)
-        initToasts(endTime: ride.getEndTime())
+        doorBtn.setTitle("Pick-up Door: Front", for: UIControlState.normal)
+        doorSelector.selectRow(0, inComponent: 0, animated: false)
+        initToasts(endTime: ride.getEndTime(), message: message)
         self.ride = RideInfo(email: "",end: "",endTime: "",eta: "",numRiders: "",start: "",time: "",waitTime: "",ts: 0,token: "",vehicle: "")
         self.mapView.clear()
         let camera = GMSCameraPosition.camera(withLatitude: 41.505199, longitude: -90.550674, zoom: 15)
@@ -861,7 +967,12 @@ class MapsView: UIViewController, GIDSignInUIDelegate, UITextFieldDelegate, CLLo
                 let postDict = snapshot.value as? NSDictionary
                 let endTime = postDict?["endTime"] as? String ?? ""
                 if (endTime == "Cancelled by Dispatcher") {
-                    self.showAlert(title: "Ride Cancelled", msg: "Requested ride cancelled by dispatcher.")
+                    let reason = postDict?["message"] as? String ?? ""
+                    if (reason == "") {
+                        self.showAlert(title: "Ride Cancelled", msg: "Requested ride cancelled by dispatcher.")
+                    } else {
+                        self.showAlert(title: "Ride Cancelled", msg: "Requested ride cancelled by dispatcher:\n\(reason)")
+                    }
                 }
             }
         })

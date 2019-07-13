@@ -15,7 +15,7 @@ import FirebaseDatabase
 
 // For returning ride data to the Maps View
 protocol MyProtocol {
-    func setRide(ride: RideInfo)
+    func setRide(ride: RideInfo, message: String)
 }
 
 class RequestedRideView: UIViewController {
@@ -61,7 +61,6 @@ class RequestedRideView: UIViewController {
         view.addSubview(logo)
         
         setupListeners()
-        outputTS()
     }
     
     // Add and anchor (to the top, left, right, height) a subview with the given constraints to the view
@@ -116,7 +115,7 @@ class RequestedRideView: UIViewController {
                 cancelled.setValue(["email": email, "end": end, "endTime": "Cancelled by User", "eta": eta, "numRiders": numRiders, "start": start, "time": time, "timestamp": timestamp, "waitTime": waitTime, "vehicle": vehicle])
                 pendingRef.setValue(["email": email, "endTime": "Cancelled by User", "timestamp": timestamp])
                 pendingRef.removeValue()
-                self.delegate?.setRide(ride: self.ride)
+                self.delegate?.setRide(ride: self.ride, message: "")
                 self.dismiss(animated: true, completion: nil)
             }
         })
@@ -135,7 +134,7 @@ class RequestedRideView: UIViewController {
                 cancelled.setValue(["email": email, "end": end, "endTime": "Cancelled by User", "eta": eta, "numRiders": numRiders, "start": start, "time": time, "timestamp": timestamp, "waitTime": waitTime, "vehicle": vehicle])
                 activeRef.setValue(["email": email, "endTime": "Cancelled by User", "timestamp": timestamp])
                 activeRef.removeValue()
-                self.delegate?.setRide(ride: self.ride)
+                self.delegate?.setRide(ride: self.ride, message: "")
                 self.dismiss(animated: true, completion: nil)
             }
         })
@@ -154,13 +153,10 @@ class RequestedRideView: UIViewController {
     // Set up the Firebase listeners for if a ride is completed, cancelled, or updated by the dipatcher
     func setupListeners() {
         let email = ride.getEmail()
-        let emailTS = "\(ride.getEmail())_\(ride.getTimestamp())" // email with timestamp
         let active = ref.child("ACTIVE RIDES").child(email)
         let pending = ref.child("PENDING RIDES").child(email)
         setupPendingOrActive(email: email, ref: pending)
         setupPendingOrActive(email: email, ref: active)
-        setupCancelled(email: emailTS)
-        setupCompleted(email: emailTS)
     }
     
     // Set up the Firebase listeners for pending or active rides
@@ -175,6 +171,7 @@ class RequestedRideView: UIViewController {
                     let waitTime = postDict?["waitTime"] as? String ?? ""
                     let eta = postDict?["eta"] as? String ?? ""
                     var vehicle = postDict?["vehicle"] as? String ?? ""
+                    let ts = postDict?["timestamp"] as? Int64 ?? 0
                     if (vehicle == " ") {
                         self.dataLbl.text = "Start: \(start)\nEnd: \(end)\nVehicle: TBD"
                     } else {
@@ -188,8 +185,13 @@ class RequestedRideView: UIViewController {
                     }
                     self.ride.setVehicle(vehicle: vehicle)
                     self.ride.setWaitTime(waitTime: waitTime)
+                    self.ride.setTimestamp(ts: ts)
                     self.ride.setETA(eta: eta)
                 }
+                let emailTS = "\(self.ride.getEmail())_\(self.ride.getTimestamp())" // email with timestamp
+                self.setupCancelled(email: emailTS)
+                self.setupCompleted(email: emailTS)
+                self.outputTS()
             }
         })
     }
@@ -204,7 +206,8 @@ class RequestedRideView: UIViewController {
                 if (endTime == "Cancelled by Dispatcher") {
                     self.deleteTS()
                     self.ride.setEndTime(endTime: endTime)
-                    self.delegate?.setRide(ride: self.ride)
+                    let message = postDict?["message"] as? String ?? ""
+                    self.delegate?.setRide(ride: self.ride, message: message)
                     self.dismiss(animated: true, completion: nil)
                 }
             }
@@ -220,7 +223,7 @@ class RequestedRideView: UIViewController {
                 let endTime = postDict?["endTime"] as? String ?? ""
                 self.deleteTS()
                 self.ride.setEndTime(endTime: endTime)
-                self.delegate?.setRide(ride: self.ride)
+                self.delegate?.setRide(ride: self.ride, message: "")
                 self.dismiss(animated: true, completion: nil)
             }
         })

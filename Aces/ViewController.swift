@@ -58,10 +58,10 @@ func constructLbl(text: String) -> UILabel {
     return lbl
 }
 
-func constructSearchFld(text: String) -> SearchTextField {
+func constructSearchFld(text: String, color: UIColor) -> SearchTextField {
     let tf = SearchTextField()
     tf.borderStyle = .roundedRect
-    tf.backgroundColor = .white
+    tf.backgroundColor = color
     tf.layer.borderColor = UIColor.darkGray.cgColor
     tf.placeholder = text
     tf.isEnabled = false
